@@ -11,6 +11,8 @@ from llama_flash_attn_monkey_patch import replace_llama_attn_with_flash_attn
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
+from functools import partial
+import LongLM.llama_self_extend_patch as LlamaSE
 from LongLM.modify_utils import modify_method_of_instance
 
 def parse_args(args=None):
@@ -109,6 +111,8 @@ def load_model_and_tokenizer(path, model_name, device):
         model = AutoModelForCausalLM.from_pretrained(path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(device)
     elif "selfext-llama2" in model_name:
         model_path = 'meta-llama/Llama-2-7b-chat-hf'
+        self_extend_forward = partial(LlamaSE.self_extend_forward, group_size_1=8, group_size_2=1024)
+
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
