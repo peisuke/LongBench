@@ -1,0 +1,3 @@
+[submodule "LongLM"]
+	path = LongLM
+	url = https://github.com/datamllab/LongLM.git
